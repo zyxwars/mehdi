@@ -1,0 +1,5 @@
+{
+    "watchDir": "./src",
+    "snippetDir": "./src/snippets",
+    "distDir": "./dist"
+}
