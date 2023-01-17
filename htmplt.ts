@@ -1,8 +1,7 @@
 import chokidar from "chokidar";
-import { ArgumentParser } from "argparse";
 import fs from "fs";
 
-const normalizePath = (path) => {
+const normalizePath = (path: string) => {
   // Add ./ to path starting like this src/snippets > ./src/snippets
   if (!(path.startsWith("./") || path.startsWith("/"))) path = "./" + path;
 
@@ -10,15 +9,15 @@ const normalizePath = (path) => {
   return path.replace(/\\/g, "/");
 };
 
-const keifyPath = (path, rootDir) => {
+const keifyPath = (path: string, rootDir: string) => {
   // ./src/test.html > test.html
   return path.replace(rootDir + "/", "");
 };
 
-const loadSnippets = (snippetDir) => {
+const loadSnippets = (snippetDir: string) => {
   snippetDir = normalizePath(snippetDir);
 
-  let parsedSnippets = {};
+  let parsedSnippets: {[key: string] : string} = {};
 
   const dirents = fs.readdirSync(snippetDir, { withFileTypes: true });
 
@@ -47,7 +46,7 @@ const config = {
   distDir: "./dist",
 };
 
-let snippets = loadSnippets(config.snippetDir);
+let snippets: {[key: string] : string} = loadSnippets(config.snippetDir);
 
 // Watch snippet changes
 chokidar.watch(config.snippetDir).on("change", (path) => {
@@ -75,10 +74,12 @@ chokidar.watch(config.watchDir).on("change", (path) => {
   fs.readFile(path, "utf-8", (err, data) => {
     if (err) throw err;
 
-    Object.entries(snippets).forEach((key, val) => {
-      data = data.replace(`{{${key}}}`, val);
+    Object.entries(snippets).forEach((entry) => {
+      const key = `{{${keifyPath(entry[0], config.snippetDir)}}}`
+      const val = entry[1]
+      data = data.replace(key, val);
     });
 
-    fs.writeFile(distDir + keifyPath(path, config.watchDir), data);
+    fs.writeFileSync(config.distDir + '/' + keifyPath(path, config.watchDir), data);
   });
 });
