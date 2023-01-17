@@ -1,0 +1,16 @@
+{
+  "name": "htmplt",
+  "version": "1.0.0",
+  "main": "htmplt.js",
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "chokidar": "^3.5.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module"
+}
