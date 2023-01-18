@@ -1,31 +1,32 @@
 import * as fs from "fs";
+import * as path from "path";
 import { loadConfig, loadSnippets, populateTemplate } from "./utils";
 
 export function main() {
   const config = loadConfig();
 
-  let snippets = loadSnippets(config.snippetDir);
+  let snippets = loadSnippets(config.snippetDir, config.snippetDir);
 
-  const updateDir = (entryName: string) => {
-    const dirents = fs.readdirSync(entryName, { withFileTypes: true });
+  const updateDir = (dirPath: string) => {
+    const dirents = fs.readdirSync(dirPath, { withFileTypes: true });
 
     dirents.forEach((dirent) => {
       // Don't change files outside of watch dir and inside snippet and dist dirs if they collide
       if (
-        entryName.includes(config.watchDir) &&
-        (entryName.includes(config.snippetDir) ||
-          entryName.includes(config.distDir))
+        dirPath.includes(config.watchDir) &&
+        (dirPath.includes(config.snippetDir) ||
+          dirPath.includes(config.distDir))
       )
         return;
 
       // Recurse directories
       if (dirent.isDirectory()) {
-        updateDir(entryName + "/" + dirent.name);
+        updateDir(path.resolve(dirPath, dirent.name));
         return;
       }
 
       populateTemplate(
-        entryName + "/" + dirent.name,
+        path.resolve(dirPath, dirent.name),
         snippets,
         config.snippetDir,
         config.watchDir,
@@ -35,8 +36,6 @@ export function main() {
   };
 
   updateDir(config.watchDir);
-
-  console.log("TEMPLATE: All templates populated successfully");
 }
 
 if (require.main === module) {

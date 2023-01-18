@@ -1,21 +1,27 @@
 import * as chokidar from "chokidar";
 import * as path from "path";
 import * as fs from "fs";
-import { keifyPath, loadSnippets, populateTemplate, loadConfig } from "./utils";
+import {
+  keifyPath,
+  loadSnippets,
+  populateTemplate,
+  loadConfig,
+  normalizeTemplateKey,
+} from "./utils";
 
 export function main() {
   const config = loadConfig();
 
-  let snippets = loadSnippets(config.snippetDir);
+  let snippets = loadSnippets(config.snippetDir, config.snippetDir);
 
   // Watch snippet changes
   chokidar.watch(config.snippetDir).on("change", (entryName) => {
-    entryName = path.normalize(entryName);
+    entryName = path.resolve(entryName);
 
     snippets[entryName] = fs.readFileSync(entryName, "utf-8");
 
     console.log(
-      `SNIPPET: Updated key ${keifyPath(
+      `SNIPPET: Updated key ${normalizeTemplateKey(
         entryName,
         config.snippetDir
       )} (${entryName})`
@@ -24,7 +30,7 @@ export function main() {
 
   // Watch source files
   chokidar.watch(config.watchDir).on("change", (entryName) => {
-    entryName = path.normalize(entryName);
+    entryName = path.resolve(entryName);
 
     // Don't change files outside of watch dir and inside snippet and dist dirs if they collide
     if (

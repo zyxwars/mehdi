@@ -5,65 +5,75 @@ interface IConfig {
   watchDir: string;
   snippetDir: string;
   distDir: string;
-  config: string;
 }
 
 /**
  * Load htmplt.json from cwd
  */
+
+const resolveConfigPaths = (config: IConfig) => {
+  Object.entries(config).forEach(
+    (entry) => (config[entry[0]] = path.resolve(entry[1]))
+  );
+  return config;
+};
+
 export const loadConfig = (): IConfig => {
-  const defaults = {
+  let defaults = {
     watchDir: "./src",
     snippetDir: "./src/snippets",
     distDir: "./dist",
-    config: "default",
   };
+  defaults = resolveConfigPaths(defaults);
 
+  // Load custom config
   const configPath = path.resolve("./htmplt.json");
-
   if (!fs.existsSync(configPath)) {
     console.log("CONFIG: Loaded default config, looked for", configPath);
 
     return defaults;
   }
-
-  const customConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  let customConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  customConfig = resolveConfigPaths(customConfig);
 
   console.log("CONFIG: Loaded", configPath);
   return { ...defaults, ...customConfig };
 };
 
 /**
- * ./src/test.html > test.html
+ * .../src/test.html > test.html
  */
 export const keifyPath = (entryName: string, rootDir: string) => {
-  return entryName.replace(rootDir + "/", "").replace("\\", "/");
+  return entryName.replace(rootDir + "/", "");
 };
 
-export const loadSnippets = (snippetDir: string): { [key: string]: string } => {
+export const normalizeTemplateKey = (entryName: string, rootDir: string) => {
+  return keifyPath(entryName, rootDir).replace("\\", "/");
+};
+
+export const loadSnippets = (
+  snippetDir: string,
+  configSnippetDir: string
+): { [key: string]: string } => {
   if (!fs.existsSync(snippetDir)) {
     console.log(
-      `SNIPPET: No snippet directory found, looked for ${path.resolve(
-        snippetDir
-      )}`
+      `SNIPPET: No snippet directory found, looked for ${snippetDir}`
     );
     process.exit();
   }
-
-  snippetDir = path.normalize(snippetDir);
 
   let parsedSnippets: { [key: string]: string } = {};
 
   const dirents = fs.readdirSync(snippetDir, { withFileTypes: true });
 
   dirents.forEach((dirent) => {
-    const entryName = snippetDir + "/" + dirent.name;
+    const entryName = path.resolve(snippetDir, dirent.name);
 
     // Recurse directories
     if (dirent.isDirectory()) {
       parsedSnippets = {
         ...parsedSnippets,
-        ...loadSnippets(entryName),
+        ...loadSnippets(entryName, configSnippetDir),
       };
       return;
     }
@@ -74,7 +84,7 @@ export const loadSnippets = (snippetDir: string): { [key: string]: string } => {
       "SNIPPET: Loaded",
       entryName,
       "use key",
-      keifyPath(entryName, snippetDir)
+      normalizeTemplateKey(entryName, configSnippetDir)
     );
   });
 
@@ -92,24 +102,24 @@ export const populateTemplate = (
     if (err) throw err;
 
     Object.entries(snippets).forEach((snippet) => {
-      const key = `{{${keifyPath(snippet[0], snippetDir)}}}`;
+      const key = `{{${normalizeTemplateKey(snippet[0], snippetDir)}}}`;
       const val = snippet[1];
 
-      data = data.replace(key, val);
+      data = data.replace(new RegExp(key, "g"), val);
     });
 
     fs.mkdir(distDir, { recursive: true }, (err) => {
       if (err) throw err;
-      console.log("test");
-      console.log(keifyPath(entryName, watchDir));
 
-      fs.writeFileSync(distDir + "/" + keifyPath(entryName, watchDir), data);
-      console.log("tset1");
-
+      fs.writeFileSync(
+        path.resolve(distDir, keifyPath(entryName, watchDir)),
+        data
+      );
       console.log(
-        `TEMPLATE: Saved ${keifyPath(entryName, watchDir)} as ${
-          distDir + "/" + keifyPath(entryName, watchDir)
-        }`
+        `TEMPLATE: Saved ${keifyPath(entryName, watchDir)} as ${path.resolve(
+          distDir,
+          keifyPath(entryName, watchDir)
+        )}`
       );
     });
   });
