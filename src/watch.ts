@@ -1,43 +1,49 @@
 import * as chokidar from "chokidar";
+import * as path from "path";
 import * as fs from "fs";
-import {
-  normalizePath,
-  keifyPath,
-  loadSnippets,
-  populateTemplate,
-} from "./lib";
+import { keifyPath, loadSnippets, populateTemplate, loadConfig } from "./utils";
 
-import config from "./config.json";
+export function main() {
+  const config = loadConfig();
 
-let snippets = loadSnippets(config.snippetDir);
+  let snippets = loadSnippets(config.snippetDir);
 
-// Watch snippet changes
-chokidar.watch(config.snippetDir).on("change", (path) => {
-  path = normalizePath(path);
+  // Watch snippet changes
+  chokidar.watch(config.snippetDir).on("change", (entryName) => {
+    entryName = path.normalize(entryName);
 
-  snippets[path] = fs.readFileSync(path, "utf-8");
+    snippets[entryName] = fs.readFileSync(entryName, "utf-8");
 
-  console.log(
-    `SNIPPET: Updated key ${keifyPath(path, config.snippetDir)} (${path})`
-  );
-});
+    console.log(
+      `SNIPPET: Updated key ${keifyPath(
+        entryName,
+        config.snippetDir
+      )} (${entryName})`
+    );
+  });
 
-// Watch source files
-chokidar.watch(config.watchDir).on("change", (path) => {
-  path = normalizePath(path);
+  // Watch source files
+  chokidar.watch(config.watchDir).on("change", (entryName) => {
+    entryName = path.normalize(entryName);
 
-  // Don't change files outside of watch dir and inside snippet and dist dirs if they collide
-  if (
-    path.includes(config.watchDir) &&
-    (path.includes(config.snippetDir) || path.includes(config.distDir))
-  )
-    return;
+    // Don't change files outside of watch dir and inside snippet and dist dirs if they collide
+    if (
+      entryName.includes(config.watchDir) &&
+      (entryName.includes(config.snippetDir) ||
+        entryName.includes(config.distDir))
+    )
+      return;
 
-  populateTemplate(
-    path,
-    snippets,
-    config.snippetDir,
-    config.watchDir,
-    config.distDir
-  );
-});
+    populateTemplate(
+      entryName,
+      snippets,
+      config.snippetDir,
+      config.watchDir,
+      config.distDir
+    );
+  });
+}
+
+if (require.main === module) {
+  main();
+}

@@ -1,0 +1,6 @@
+{
+  "watchDir": "./test/src",
+  "snippetDir": "./test/src/snippets",
+  "distDir": "./test/dist",
+  "config": "default"
+}

@@ -1,35 +1,44 @@
 import * as fs from "fs";
-import { loadSnippets, populateTemplate } from "./lib";
+import { loadConfig, loadSnippets, populateTemplate } from "./utils";
 
-import config from "./config.json";
+export function main() {
+  const config = loadConfig();
 
-let snippets = loadSnippets(config.snippetDir);
+  let snippets = loadSnippets(config.snippetDir);
 
-const updateDir = (path: string) => {
-  const dirents = fs.readdirSync(path, { withFileTypes: true });
+  const updateDir = (entryName: string) => {
+    const dirents = fs.readdirSync(entryName, { withFileTypes: true });
 
-  dirents.forEach((dirent) => {
-    // Don't change files outside of watch dir and inside snippet and dist dirs if they collide
-    if (
-      path.includes(config.watchDir) &&
-      (path.includes(config.snippetDir) || path.includes(config.distDir))
-    )
-      return;
+    dirents.forEach((dirent) => {
+      // Don't change files outside of watch dir and inside snippet and dist dirs if they collide
+      if (
+        entryName.includes(config.watchDir) &&
+        (entryName.includes(config.snippetDir) ||
+          entryName.includes(config.distDir))
+      )
+        return;
 
-    // Recurse directories
-    if (dirent.isDirectory()) {
-      updateDir(path + "/" + dirent.name);
-      return;
-    }
+      // Recurse directories
+      if (dirent.isDirectory()) {
+        updateDir(entryName + "/" + dirent.name);
+        return;
+      }
 
-    populateTemplate(
-      path + "/" + dirent.name,
-      snippets,
-      config.snippetDir,
-      config.watchDir,
-      config.distDir
-    );
-  });
-};
+      populateTemplate(
+        entryName + "/" + dirent.name,
+        snippets,
+        config.snippetDir,
+        config.watchDir,
+        config.distDir
+      );
+    });
+  };
 
-updateDir(config.watchDir);
+  updateDir(config.watchDir);
+
+  console.log("TEMPLATE: All templates populated successfully");
+}
+
+if (require.main === module) {
+  main();
+}

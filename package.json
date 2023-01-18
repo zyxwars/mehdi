@@ -1,25 +1,27 @@
 {
   "name": "htmplt",
   "version": "1.0.0",
-  "main": "watcher.js",
   "dependencies": {
     "argparse": "^2.0.1",
     "chokidar": "^3.5.3"
   },
+  "main": "./dist/cli.ts",
   "scripts": {
-    "watch": "ts-node watch",
-    "populate": "ts-node populate",
+    "build": "npx tsc",
+    "buildlink": "npx tsc && npm link",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "zyxwars",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "ts-node": "^10.9.1",
-    "tsc": "^2.0.4",
     "typescript": "^4.9.4"
   },
   "files": [
-    "lib/**/*"
-  ]
+    "dist/**/*"
+  ],
+  "bin": {
+    "htmplt": "./dist/cli.js"
+  }
 }
