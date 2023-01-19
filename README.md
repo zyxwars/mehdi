@@ -12,7 +12,7 @@
 ## Installation
 
 ```
-npm install npm i https://github.com/zyxwars/mehdi
+npm i https://github.com/zyxwars/mehdi
 ```
 
 ## Run
