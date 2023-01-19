@@ -1,5 +1,5 @@
 <div align='center'>
- <img src="assets/logo.svg" width=300 height=300/>
+ <img src="assets/logo-outline.svg" width=300 height=300/>
 
 # Mehdi
 
