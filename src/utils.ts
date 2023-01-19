@@ -7,6 +7,12 @@ interface IConfig {
   distDir: string;
 }
 
+export const defaultConfig = {
+  watchDir: "./src",
+  snippetDir: "./src/snippets",
+  distDir: "./dist",
+};
+
 /**
  * Load htmplt.json from cwd
  */
@@ -21,11 +27,7 @@ export const loadConfig = (): IConfig => {
     return config;
   };
 
-  let defaults = {
-    watchDir: "./src",
-    snippetDir: "./src/snippets",
-    distDir: "./dist",
-  };
+  let defaults = defaultConfig;
   defaults = resolveConfigPaths(defaults);
 
   // Load custom config
@@ -55,7 +57,7 @@ export const keifyPath = (entryName: string, rootDir: string) => {
  * ...\src\test\test.html > test/test.html
  */
 export const normalizeTemplateKey = (entryName: string, rootDir: string) => {
-  return keifyPath(entryName, rootDir).replace("\\", "/");
+  return keifyPath(entryName, rootDir).replace(/\\/g, "/");
 };
 
 export const loadSnippets = (

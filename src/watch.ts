@@ -8,6 +8,7 @@ import {
   normalizeTemplateKey,
 } from "./utils";
 
+
 export function main() {
   const config = loadConfig();
 
