@@ -34,9 +34,9 @@ npx mehdi watch
 By default mehdi will use these folders, relative to current working directory
 
 ```javascript
-watchDir: "./src" // put your templates here
-snippetDir: "./src/snippets" // put your snippets here
-distDir: "./dist" // templates will be compiled here
+watchDir: "./src"; // put your templates here
+snippetDir: "./src/snippets"; // put your snippets here
+distDir: "./dist"; // templates will be compiled here
 ```
 
 You can customize these by creating <strong>mehdi.config.json</strong> in the current working directory
