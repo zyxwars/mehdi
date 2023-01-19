@@ -1,3 +1,4 @@
 node_modules/
 dist/
-htmplt.json
+mehdi.config.json
+test/

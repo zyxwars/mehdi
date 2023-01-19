@@ -1,5 +1,5 @@
 {
-  "name": "htmplt",
+  "name": "mehdi",
   "version": "1.0.0",
   "dependencies": {
     "chokidar": "^3.5.3"
@@ -23,6 +23,6 @@
     "dist/**/*"
   ],
   "bin": {
-    "htmplt": "./dist/cli.js"
+    "mehdi": "./dist/cli.js"
   }
 }

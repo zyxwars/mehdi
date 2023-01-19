@@ -14,7 +14,7 @@ export const defaultConfig = {
 };
 
 /**
- * Load htmplt.json from cwd
+ * Load mehdi.json from cwd
  */
 export const loadConfig = (): IConfig => {
   /**
@@ -31,7 +31,7 @@ export const loadConfig = (): IConfig => {
   defaults = resolveConfigPaths(defaults);
 
   // Load custom config
-  const configPath = path.resolve("./htmplt.config.json");
+  const configPath = path.resolve("./mehdi.config.json");
 
   if (!fs.existsSync(configPath)) {
     console.log("CONFIG: Loaded default config, looked for", configPath);
