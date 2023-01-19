@@ -1,11 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import { loadConfig, loadSnippets, populateTemplate } from "./utils";
+import { loadConfig, loadSnippets, compileTemplate } from "./utils";
 
 export function main() {
   const config = loadConfig();
 
-  let snippets = loadSnippets(config.snippetDir, config.snippetDir);
+  let snippets = loadSnippets(config.snippetDir);
 
   const updateDir = (dirPath: string) => {
     const dirents = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -25,7 +25,7 @@ export function main() {
         return;
       }
 
-      populateTemplate(
+      compileTemplate(
         path.resolve(dirPath, dirent.name),
         snippets,
         config.snippetDir,

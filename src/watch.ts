@@ -2,9 +2,8 @@ import * as chokidar from "chokidar";
 import * as path from "path";
 import * as fs from "fs";
 import {
-  keifyPath,
   loadSnippets,
-  populateTemplate,
+  compileTemplate,
   loadConfig,
   normalizeTemplateKey,
 } from "./utils";
@@ -12,12 +11,13 @@ import {
 export function main() {
   const config = loadConfig();
 
-  let snippets = loadSnippets(config.snippetDir, config.snippetDir);
+  let snippets = loadSnippets(config.snippetDir);
 
   // Watch snippet changes
   chokidar.watch(config.snippetDir).on("change", (entryName) => {
     entryName = path.resolve(entryName);
 
+    // Load snippet data to key
     snippets[entryName] = fs.readFileSync(entryName, "utf-8");
 
     console.log(
@@ -40,7 +40,7 @@ export function main() {
     )
       return;
 
-    populateTemplate(
+    compileTemplate(
       entryName,
       snippets,
       config.snippetDir,
